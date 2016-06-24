@@ -43,10 +43,21 @@ class CygwinUtil
 
   CygwinUtil(Project project)
   {
+    Closure cygWin = {
+	    new ByteArrayOutputStream().withStream { os ->
+    	  	_project.exec {
+        		executable = 'uname'
+        		standardOutput = os
+      		}
+      		def outputString = os.toString().trim()
+			return outputString
+    	}
+  	}
     _project = project
+    println System.getProperty("os.name")
     _env = System.getenv()
-    _isWin = _env['OS'].toLowerCase().startsWith('win')
-    _isCygwin = _isWin && _env['CYGWIN'] != null
+    _isWin = System.getProperty("os.name").toLowerCase().startsWith('win')
+    _isCygwin = _isWin && cygWin().toLowerCase().startsWith('cygwin')
   }
 
   def winOrUnixSeparator(String path)
